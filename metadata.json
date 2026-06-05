@@ -1,0 +1,6 @@
+{
+  "name": "India Emergency Resource Directory",
+  "description": "A comprehensive, verified emergency directory for India covering national, state, and district contacts with reviews, submissions, and reports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
