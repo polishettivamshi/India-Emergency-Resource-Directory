@@ -43,7 +43,13 @@ Create a `.env` file at the root of the project to initialize credentials:
 # ADMINISTRATOR DESK CREDENTIALS
 ADMIN_USERNAME="xxxxxxxxxxxxxxx"
 ADMIN_PASSWORD="xxxxxxxxxxxxxxxxxxxxxxxx"
+
+# SUPABASE BACKEND ACCESS
+SUPABASE_URL="https://<your-project-ref>.supabase.co"
+SUPABASE_SERVICE_ROLE_KEY="<your-service-role-key>"
 ```
+
+> Note: The backend server should use `SUPABASE_SERVICE_ROLE_KEY` to perform writes and seeding when Row Level Security (RLS) is enabled in Supabase.
 
 > **Security Note:** In order to keep administrative channels fully air-gapped, standard contributor registration is restricted. Only logins matching the exact credentials defined within the server-side environment variables will successfully authenticate.
 

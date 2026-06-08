@@ -1,10 +1,16 @@
 import dotenv from "dotenv";
-dotenv.config();
+import path from "path";
+
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+console.log("Loaded env: SUPABASE_URL=", Boolean(process.env.SUPABASE_URL));
+console.log("Loaded env: SUPABASE_ANON_KEY=", Boolean(process.env.SUPABASE_ANON_KEY));
+console.log("Loaded env: SUPABASE_SERVICE_ROLE_KEY=", Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY));
 
 import express from "express";
-import path from "path";
 import { createServer as createViteServer } from "vite";
-import { 
+
+const db = await import("./server/db");
+const {
   addAuditLog,
   getContactsFilter,
   getContactById,
@@ -21,11 +27,13 @@ import {
   deleteContactDirectly,
   getAuditLogs,
   getAnalyticsSummary
-} from "./server/db";
+} = db;
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const DEFAULT_PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
+  const PORT = Number.isFinite(DEFAULT_PORT) && DEFAULT_PORT > 0 ? DEFAULT_PORT : 3000;
+  const HMR_PORT = process.env.VITE_HMR_PORT ? Number(process.env.VITE_HMR_PORT) : PORT + 10;
 
   // Body parser limit increase for attachments
   app.use(express.json({ limit: '10mb' }));
@@ -51,8 +59,8 @@ async function startServer() {
     const trimmedEmail = email.trim().toLowerCase();
 
     // Check Admin credentials matching the environment variables
-    let envUser = (process.env.ADMIN_USERNAME || "admin@emergency.in").trim();
-    let envPass = (process.env.ADMIN_PASSWORD || "EmergencyDirectorSecure2026!").trim();
+    let envUser = process.env.ADMIN_USERNAME;
+    let envPass = process.env.ADMIN_PASSWORD;
 
     if (envUser.startsWith('"') && envUser.endsWith('"')) {
       envUser = envUser.slice(1, -1).trim();
@@ -335,7 +343,12 @@ async function startServer() {
 
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        hmr: {
+          port: HMR_PORT
+        }
+      },
       appType: "spa",
     });
     app.use(vite.middlewares);
@@ -347,9 +360,28 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`India Emergency Database is fully active. Direct requests logging to http://localhost:${PORT}`);
-  });
+  const maxPortAttempts = 5;
+  let currentPort = PORT;
+
+  const startListening = (port: number, attempt = 1) => {
+    const server = app.listen(port, "0.0.0.0", () => {
+      console.log(`India Emergency Database is fully active. Direct requests logging to http://localhost:${port}`);
+    });
+
+    server.on("error", (err: any) => {
+      if (err.code === "EADDRINUSE" && attempt < maxPortAttempts) {
+        const nextPort = port + 1;
+        console.warn(`Port ${port} is already in use. Retrying on port ${nextPort}...`);
+        currentPort = nextPort;
+        startListening(nextPort, attempt + 1);
+      } else {
+        console.error(`Failed to start server on port ${port}:`, err.message || err);
+        process.exit(1);
+      }
+    });
+  };
+
+  startListening(currentPort);
 }
 
 startServer();

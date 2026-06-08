@@ -1656,11 +1656,11 @@ export default function App() {
             always prioritize dialing the universal government direct lines <strong className="text-orange-500">112</strong> / <strong className="text-emerald-600 font-bold">100</strong> immediately.
           </p>
           <div className="flex items-center justify-center gap-4 text-xs font-semibold flex-wrap">
-            <span className={isDark ? "text-slate-550" : "text-slate-600"}>Server Active: Port 3000 Mode</span>
-            <span className="text-slate-600">•</span>
-            <span className={isDark ? "text-slate-550" : "text-slate-600"}>Region Code: IN-99</span>
-            <span className="text-slate-600">•</span>
-            <span className={isDark ? "text-slate-550" : "text-slate-600"}>UTC Clock: 2026-06-05</span>
+            {/* <span className={isDark ? "text-slate-550" : "text-slate-600"}>Server Active: Port 3000 Mode</span> */}
+            {/* <span className="text-slate-600">•</span> */}
+            {/* <span className={isDark ? "text-slate-550" : "text-slate-600"}>Region Code: IN-99</span> */}
+            {/* <span className="text-slate-600">•</span> */}
+            {/* <span className={isDark ? "text-slate-550" : "text-slate-600"}>UTC Clock: 2026-06-05</span> */}
             <span className="text-slate-600">•</span>
             <button 
               onClick={() => {
@@ -1668,8 +1668,7 @@ export default function App() {
                 setShowLoginModal(true);
               }} 
               className="text-sky-600 hover:text-sky-500 hover:underline cursor-pointer font-bold transition duration-150"
-            >
-              Security & Staff Login
+            >Security & Staff Login
             </button>
           </div>
         </div>
@@ -1835,7 +1834,7 @@ export default function App() {
                 <label className="block font-bold">Verification Evidence / Extra Context (Optional)</label>
                 <textarea
                   rows={2}
-                  placeholder="Details of verification, e.g., 'Checked on Telecom Gazette or verified on government website link on 2026-06-05'"
+                  placeholder="Details of verification, e.g., 'Checked on Telecom Gazette or verified on government website link.'"
                   value={subEvidence}
                   onChange={(e) => setSubEvidence(e.target.value)}
                   className={`w-full p-2.5 rounded-xl border outline-none ${
@@ -1850,7 +1849,7 @@ export default function App() {
                   <label className="block font-bold">Your Name (Optional)</label>
                   <input
                     type="text"
-                    placeholder="Vamshi Polishetty"
+                    placeholder="username"
                     value={subSubmitterName}
                     onChange={(e) => setSubSubmitterName(e.target.value)}
                     className={`w-full p-2.5 rounded-xl border outline-none ${
@@ -1863,7 +1862,7 @@ export default function App() {
                   <label className="block font-bold">Your Contact Email (Optional)</label>
                   <input
                     type="email"
-                    placeholder="email@example.com"
+                    placeholder="user email (for follow-up if needed)"
                     value={subSubmitterEmail}
                     onChange={(e) => setSubSubmitterEmail(e.target.value)}
                     className={`w-full p-2.5 rounded-xl border outline-none ${
@@ -2101,7 +2100,7 @@ export default function App() {
                 <strong>Evidence Checked:</strong> {selectedContactToView.verificationEvidence || "Approved government service registration databases."}
               </p>
               <p className={`text-[10px] font-mono pt-1 ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                Last Tested Integrity & Operability: {selectedContactToView.lastVerifiedDate}
+                Last Integrity & Operability: {selectedContactToView.lastVerifiedDate}
               </p>
             </div>
 
@@ -2171,7 +2170,7 @@ export default function App() {
 
               <div className="space-y-3">
                 <div>
-                  <label className={`block mb-1 font-bold ${isDark ? "text-slate-400" : "text-slate-700"}`}>Admin Username / Email</label>
+                  <label className={`block mb-1 font-bold ${isDark ? "text-slate-400" : "text-slate-700"}`}>Admin Username</label>
                   <input
                     type="text"
                     placeholder="e.g. admin@emergency.in"
@@ -2183,7 +2182,7 @@ export default function App() {
                 </div>
 
                 <div>
-                  <label className={`block mb-1 font-bold ${isDark ? "text-slate-440" : "text-slate-700"}`}>System Key / Password</label>
+                  <label className={`block mb-1 font-bold ${isDark ? "text-slate-440" : "text-slate-700"}`}>Admin Password</label>
                   <input
                     type="password"
                     placeholder="••••••••"
@@ -2198,7 +2197,7 @@ export default function App() {
                   type="submit"
                   className="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 rounded-xl transition cursor-pointer text-xs mt-4 block shadow-md shadow-amber-600/10"
                 >
-                  Access Desk Command Center
+                  Login
                 </button>
               </div>
             </form>

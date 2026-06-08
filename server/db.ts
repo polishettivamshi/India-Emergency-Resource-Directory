@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import dotenv from "dotenv";
 import { createClient } from "@supabase/supabase-js";
 import { 
   EmergencyCategory, 
@@ -12,18 +13,30 @@ import {
   VerificationStatus
 } from "../src/types";
 
+// Ensure env is loaded before the Supabase client is created.
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+
 // --- CLIENT SETUP ---
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-export const isSupabaseActive = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
+console.log("Supabase env check:", {
+  url: Boolean(SUPABASE_URL),
+  anonKey: Boolean(SUPABASE_ANON_KEY),
+  serviceRoleKey: Boolean(SUPABASE_SERVICE_ROLE_KEY),
+  serviceRoleLength: SUPABASE_SERVICE_ROLE_KEY?.length ?? 0
+});
+
+export const isSupabaseActive = !!(SUPABASE_URL && (SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY));
 
 export const supabase = isSupabaseActive 
-  ? createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!) 
+  ? createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY!) 
   : null;
 
 if (isSupabaseActive) {
-  console.log("⚡ Supabase integration active: Connected to PostgreSQL cloud server.");
+  const mode = SUPABASE_SERVICE_ROLE_KEY ? "Service Role" : "Anon public";
+  console.log(`⚡ Supabase integration active: Connected to PostgreSQL cloud server using ${mode} key.`);
 } else {
   console.log("📦 Standard local persistence active: Storing emergency telemetry in database.json.");
 }
@@ -41,23 +54,7 @@ interface DatabaseSchema {
   searchKeywords: { [keyword: string]: number };
 }
 
-// Default Seed Data
-const DEFAULT_USERS: User[] = [
-  {
-    id: "user-admin",
-    email: "admin@emergency.in",
-    name: "System Admin (India Emergency Desk)",
-    role: "Admin",
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: "user-registered",
-    email: "user@emergency.in",
-    name: "Aarav Sharma (Verified Contributor)",
-    role: "Registered",
-    createdAt: new Date().toISOString()
-  }
-];
+// Default Seed Data: users list removed (empty users will be used by default)
 
 const DEFAULT_CONTACTS: EmergencyContact[] = [
   {
@@ -259,7 +256,7 @@ export function readDb(): DatabaseSchema {
   try {
     if (!fs.existsSync(DB_FILE)) {
       writeDb({
-        users: DEFAULT_USERS,
+        users: [],
         contacts: DEFAULT_CONTACTS,
         submissions: [],
         reports: [],
@@ -293,7 +290,7 @@ export function readDb(): DatabaseSchema {
   } catch (error) {
     console.error("Failed to read database file, returning default structure", error);
     return {
-      users: DEFAULT_USERS,
+      users: [],
       contacts: DEFAULT_CONTACTS,
       submissions: [],
       reports: [],
@@ -468,6 +465,9 @@ async function autoSeedSupabase() {
       const { error: insErr } = await supabase.from("contacts").insert(contactsToInsert);
       if (insErr) {
         console.error("❌ Seeding failure on Supabase:", insErr);
+        if (insErr.code === "42501") {
+          console.error("🔐 Supabase row-level security is blocking writes. Add SUPABASE_SERVICE_ROLE_KEY to .env or configure RLS policies for the anon role.");
+        }
       } else {
         console.log("📬 Successfully populated initial national emergency numbers directly inside your Supabase Postgres tables.");
       }
