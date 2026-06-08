@@ -110,6 +110,49 @@ async function startServer() {
     });
   });
 
+  // SEO: Sitemap Generation
+  app.get("/sitemap.xml", async (req, res) => {
+    try {
+      res.type("application/xml");
+      const baseUrl = "https://india-emergency-resource-directory.onrender.com";
+      
+      let sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0">
+  <url>
+    <loc>${baseUrl}/</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>`;
+
+      try {
+        const contactList = await getContactsFilter("", "", "", "");
+        
+        if (Array.isArray(contactList)) {
+          contactList.forEach((contact: any) => {
+            sitemapXml += `
+  <url>
+    <loc>${baseUrl}/?contact=${contact.id}</loc>
+    <lastmod>${contact.lastVerified || new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+          });
+        }
+      } catch (err) {
+        console.warn("Could not fetch contacts for sitemap:", err);
+      }
+
+      sitemapXml += `
+</urlset>`;
+      res.send(sitemapXml);
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to generate sitemap" });
+    }
+  });
+
   // --- CONTACTS API (SEARCH & FILTERING) ---
 
   // Fetch filtered contacts

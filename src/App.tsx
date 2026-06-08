@@ -27,6 +27,7 @@ import {
   Sun,
   ChevronLeft,
   ChevronRight
+  ,Linkedin
 } from "lucide-react";
 import { 
   EmergencyCategory, 
@@ -2204,7 +2205,26 @@ export default function App() {
           </div>
         </div>
       )}
+              {/* Footer: Developer attribution (centered, minimal) */}
+              <footer className={`mt-8 border-t pt-4 pb-6 ${isDark ? "border-slate-800" : "border-slate-200"}`}>
+                <div className="max-w-7xl mx-auto px-4 flex items-center justify-center gap-2">
+                  <p className={`text-xs ${isDark ? "text-slate-400" : "text-slate-600"}`}>Developed by</p>
+                  <a
+                    href="https://www.linkedin.com/in/polishettivamshi/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`inline-flex items-center gap-3 text-sm font-semibold ${isDark ? "text-sky-300" : "text-sky-600"} hover:underline`}
+                    aria-label="Vamshi Polishetti LinkedIn"
+                  >
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white bg-gradient-to-tr from-orange-500 to-emerald-500">
+                      VP
+                    </div>
+                    <span className={`${isDark ? "text-slate-100" : "text-slate-900"}`}>Vamshi Polishetti</span>
+                    <Linkedin className="w-4 h-4" />
+                  </a>
+                </div>
+              </footer>
 
-    </div>
+            </div>
   );
 }

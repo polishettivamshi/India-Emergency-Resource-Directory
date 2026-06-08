@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Disallow: /api/admin
+Disallow: /admin
+
+# Sitemap location
+Sitemap: https://india-emergency-resource-directory.onrender.com/sitemap.xml
+
+# Google crawling directives
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Bing crawling
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
